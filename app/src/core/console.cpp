@@ -11,7 +11,7 @@ LOG_MODULE_REGISTER(CONSOLE);
 const struct device *uart0 = DEVICE_DT_GET(DT_NODELABEL(uart0));
 K_MSGQ_DEFINE(uart_msgq, 20, 10, 4);
 
-#define DATA_COUNT 3
+#define DATA_COUNT 5
 
 void serial_cb(const struct device *dev, void *user_data) {
     
@@ -68,6 +68,11 @@ void console_thread(void *p1, void *p2, void *p3) {
 		.payload { .char_p = 'N' }
 	};
 
+	sys_event_s shift_event{
+		.event_type = EV_SHIFT,
+		.payload { .int_p = 0 }
+	};
+
 	while (1) {
 		if (k_msgq_get(&uart_msgq, &buf, K_NO_WAIT) == 0) {
 			char *p[DATA_COUNT];
@@ -88,6 +93,11 @@ void console_thread(void *p1, void *p2, void *p3) {
 			if (p[2] != NULL) {
 				speed_event.payload.int_p = (int) strtol(p[2], (char **)NULL, 10);  
 				em.call(speed_event);				
+			}
+
+			if (p[3] != NULL && p[4] != NULL) {
+				shift_event.payload.int_p = (int) strtol(p[3], (char **)NULL, 10) + (int) strtol(p[4], (char **)NULL, 10);  
+				em.call(shift_event);		
 			}
 		}
 		k_sleep(K_MSEC(10));

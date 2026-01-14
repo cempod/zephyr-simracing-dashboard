@@ -10,6 +10,7 @@ enum sys_event_e {
     EV_BACKLIGHT = 0,
     EV_SPEED,
     EV_GEAR,
+    EV_SHIFT,
     EV_COUNT
 };
 

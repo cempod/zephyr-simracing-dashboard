@@ -12,8 +12,10 @@ class Dash {
         Dash();
         static void set_speed_callback(sys_event_s event);
         static void set_gear_callback(sys_event_s event);
+        static void shift_callback(sys_event_s event);
         static inline int speed{};
         static inline char gear{'N'};
+        static inline int shift{};
         lv_obj_t * screen;
         lv_obj_t * gear_label;
         lv_obj_t * speed_label;

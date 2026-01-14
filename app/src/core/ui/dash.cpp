@@ -77,6 +77,7 @@ Dash::Dash() {
     auto &em = EventMachine::get_machine();
     em.register_callback(EV_SPEED, set_speed_callback);
     em.register_callback(EV_GEAR, set_gear_callback);
+    em.register_callback(EV_SHIFT, shift_callback);
 }
 
 void Dash::load() {
@@ -86,6 +87,13 @@ void Dash::load() {
 void Dash::update() {
     set_label_text(speed_label, "%d", speed);
     set_label_text(gear_label, &gear);
+    if (shift == 1) {
+        lv_obj_set_style_text_color(gear_label, lv_color_make(255, 255, 0), 0);
+    } else if (shift == 2) {
+        lv_obj_set_style_text_color(gear_label, lv_color_make(255, 0, 0), 0);
+    } else {
+        lv_obj_set_style_text_color(gear_label, lv_color_make(255, 255, 255), 0);
+    }
 }
 
 void Dash::set_speed_callback(sys_event_s event) {
@@ -97,5 +105,11 @@ void Dash::set_speed_callback(sys_event_s event) {
 void Dash::set_gear_callback(sys_event_s event) {
     if (event.event_type == EV_GEAR) {
         gear = event.payload.char_p;
+    }
+}
+
+void Dash::shift_callback(sys_event_s event) {
+    if (event.event_type == EV_SHIFT) {
+        shift = event.payload.int_p;
     }
 }
