@@ -11,7 +11,15 @@ class Dash {
     private:
         Dash();
         static void set_speed_callback(sys_event_s event);
+        static void set_gear_callback(sys_event_s event);
         static inline int speed{};
+        static inline char gear{'N'};
         lv_obj_t * screen;
+        lv_obj_t * gear_label;
         lv_obj_t * speed_label;
+        lv_obj_t * speed_label_title;
+        lv_obj_t * line_left;
+        lv_obj_t * line_right;
+        lv_obj_t * line_top;
+        lv_obj_t * line_bottom;
 };

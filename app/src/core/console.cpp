@@ -11,7 +11,7 @@ LOG_MODULE_REGISTER(CONSOLE);
 const struct device *uart0 = DEVICE_DT_GET(DT_NODELABEL(uart0));
 K_MSGQ_DEFINE(uart_msgq, 20, 10, 4);
 
-#define DATA_COUNT 2
+#define DATA_COUNT 3
 
 void serial_cb(const struct device *dev, void *user_data) {
     
@@ -34,7 +34,7 @@ void serial_cb(const struct device *dev, void *user_data) {
 
 			k_msgq_put(&uart_msgq, &rx_buf, K_NO_WAIT);
 			rx_buf_pos = 0;
-		} else if (rx_buf_pos < ((int)sizeof(rx_buf) - 1)) {
+		} else if ((rx_buf_pos < ((int)sizeof(rx_buf)) - 1) && (c != '\n' && c != '\r')) {
 			rx_buf[rx_buf_pos++] = c;
 		}
 	}
@@ -58,25 +58,36 @@ void console_thread(void *p1, void *p2, void *p3) {
     char buf[64];
 
 	auto &em = EventMachine::get_machine();
-	sys_event_s event{
-		.event_type = EV_CHANGE_SPEED,
+	sys_event_s speed_event{
+		.event_type = EV_SPEED,
 		.payload { .int_p = 0 }
+	};
+
+	sys_event_s gear_event{
+		.event_type = EV_GEAR,
+		.payload { .char_p = 'N' }
 	};
 
 	while (1) {
 		if (k_msgq_get(&uart_msgq, &buf, K_NO_WAIT) == 0) {
 			char *p[DATA_COUNT];
+			
 			p[0] = strtok(buf, ";");
 
-			if (p[0] == NULL) { continue; }
+			if (p[0] == NULL || p[0][0] != 'S' || p[0][1] != 'H') { continue; }
 
 			for (int i = 1; i < DATA_COUNT; i++) {
 				p[i] = strtok(NULL, ";");
 			}
-			
+
 			if (p[1] != NULL) {
-				event.payload.int_p = (int) strtol(p[1], (char **)NULL, 10);  
-				em.call(event);				
+				gear_event.payload.char_p = p[1][0];
+				em.call(gear_event);				
+			}
+			
+			if (p[2] != NULL) {
+				speed_event.payload.int_p = (int) strtol(p[2], (char **)NULL, 10);  
+				em.call(speed_event);				
 			}
 		}
 		k_sleep(K_MSEC(10));

@@ -8,7 +8,8 @@
 
 enum sys_event_e {
     EV_BACKLIGHT = 0,
-    EV_CHANGE_SPEED,
+    EV_SPEED,
+    EV_GEAR,
     EV_COUNT
 };
 
@@ -18,6 +19,7 @@ typedef struct {
         int32_t int_p;
         uint32_t uint_p;
         float float_p;
+        char char_p;
     } payload;
 } sys_event_s;
 
