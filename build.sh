@@ -1,0 +1,1 @@
+west build -b esp32s3_devkitc/esp32s3/procpu app
