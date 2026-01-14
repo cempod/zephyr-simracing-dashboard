@@ -1,48 +1,53 @@
-/*
- * Copyright (c) 2016 Intel Corporation
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
-#include <stdio.h>
 #include <zephyr/kernel.h>
-#include <zephyr/drivers/gpio.h>
+#include <zephyr/logging/log.h>
 
-/* 1000 msec = 1 sec */
-#define SLEEP_TIME_MS   1000
+#include "backlight.h"
+#include "ui.h"
+#include "console.h"
 
-/* The devicetree node identifier for the "led0" alias. */
-#define LED0_NODE DT_ALIAS(led0)
+LOG_MODULE_REGISTER(MAIN);
 
-/*
- * A build error on this line means your board is unsupported.
- * See the sample documentation for information on how to fix this.
- */
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+k_tid_t backlight_tid;
+K_THREAD_STACK_DEFINE(backlight_thread_stack_area, 1024);
+struct k_thread backlight_thread_data;
+
+k_tid_t ui_tid;
+K_THREAD_STACK_DEFINE(ui_thread_stack_area, 8192);
+struct k_thread ui_thread_data;
+
+k_tid_t console_tid;
+K_THREAD_STACK_DEFINE(console_thread_stack_area, 4096);
+struct k_thread console_thread_data;
 
 int main(void)
-{
-	int ret;
-	bool led_state = true;
+{	
+	LOG_INF("Starting threads");
 
-	if (!gpio_is_ready_dt(&led)) {
-		return 0;
-	}
+	backlight_tid = k_thread_create(&backlight_thread_data,
+								backlight_thread_stack_area,
+								K_THREAD_STACK_SIZEOF(backlight_thread_stack_area),
+								backlight_thread,
+								NULL, NULL, NULL,
+								5, 0, K_NO_WAIT);
+	LOG_INF("Created backlight thread");
 
-	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-	if (ret < 0) {
-		return 0;
-	}
+	ui_tid = k_thread_create(&ui_thread_data,
+								ui_thread_stack_area,
+								K_THREAD_STACK_SIZEOF(ui_thread_stack_area),
+								ui_thread,
+								NULL, NULL, NULL,
+								5, 0, K_NO_WAIT);
+	LOG_INF("Created UI thread");
 
-	while (1) {
-		ret = gpio_pin_toggle_dt(&led);
-		if (ret < 0) {
-			return 0;
-		}
+	console_tid = k_thread_create(&console_thread_data,
+								console_thread_stack_area,
+								K_THREAD_STACK_SIZEOF(console_thread_stack_area),
+								console_thread,
+								NULL, NULL, NULL,
+								5, 0, K_NO_WAIT);
+	LOG_INF("Created console thread");
 
-		led_state = !led_state;
-		printf("LED state: %s\n", led_state ? "ON" : "OFF");
-		k_msleep(SLEEP_TIME_MS);
-	}
+	LOG_INF("Aborting from main");
+
 	return 0;
 }
