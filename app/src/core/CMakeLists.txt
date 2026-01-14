@@ -6,6 +6,7 @@ set(SRCS
     ${CMAKE_CURRENT_LIST_DIR}/ui/ui.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/dash.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/digits.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/small_digits.c
     ${CMAKE_CURRENT_LIST_DIR}/console.cpp
 )
 

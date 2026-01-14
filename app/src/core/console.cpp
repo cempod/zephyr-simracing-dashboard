@@ -11,7 +11,7 @@ LOG_MODULE_REGISTER(CONSOLE);
 const struct device *uart0 = DEVICE_DT_GET(DT_NODELABEL(uart0));
 K_MSGQ_DEFINE(uart_msgq, 20, 10, 4);
 
-#define DATA_COUNT 5
+#define DATA_COUNT 7
 
 void serial_cb(const struct device *dev, void *user_data) {
     
@@ -65,11 +65,21 @@ void console_thread(void *p1, void *p2, void *p3) {
 
 	sys_event_s gear_event{
 		.event_type = EV_GEAR,
-		.payload { .char_p = 'N' }
+		.payload { .int_p = 0 }
 	};
 
 	sys_event_s shift_event{
 		.event_type = EV_SHIFT,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s rpm_pct_event{
+		.event_type = EV_RPM_PCT,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s rpm_event{
+		.event_type = EV_RPM,
 		.payload { .int_p = 0 }
 	};
 
@@ -86,7 +96,13 @@ void console_thread(void *p1, void *p2, void *p3) {
 			}
 
 			if (p[1] != NULL) {
-				gear_event.payload.char_p = p[1][0];
+				if (p[1][0] == 'N' || p[1][0] == 'n') {
+					gear_event.payload.int_p = 0;
+				} else if (p[1][0] == 'R' || p[1][0] == 'r') {
+					gear_event.payload.int_p = -1;
+				} else {
+					gear_event.payload.int_p = (int) strtol(p[1], (char **)NULL, 10);
+				}
 				em.call(gear_event);				
 			}
 			
@@ -98,6 +114,16 @@ void console_thread(void *p1, void *p2, void *p3) {
 			if (p[3] != NULL && p[4] != NULL) {
 				shift_event.payload.int_p = (int) strtol(p[3], (char **)NULL, 10) + (int) strtol(p[4], (char **)NULL, 10);  
 				em.call(shift_event);		
+			}
+
+			if (p[5] != NULL) {
+				rpm_pct_event.payload.int_p = (int) strtol(p[5], (char **)NULL, 10);  
+				em.call(rpm_pct_event);				
+			}
+
+			if (p[6] != NULL) {
+				rpm_event.payload.int_p = (int) strtol(p[6], (char **)NULL, 10);  
+				em.call(rpm_event);				
 			}
 		}
 		k_sleep(K_MSEC(10));
