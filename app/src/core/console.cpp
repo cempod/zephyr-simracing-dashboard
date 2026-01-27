@@ -1,6 +1,7 @@
 #include "console.h"
 #include <stdlib.h>
 #include "string.h"
+#include <sys/_stdint.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/uart.h>
@@ -11,7 +12,7 @@ LOG_MODULE_REGISTER(CONSOLE);
 const struct device *uart0 = DEVICE_DT_GET(DT_NODELABEL(uart0));
 K_MSGQ_DEFINE(uart_msgq, 20, 10, 4);
 
-#define DATA_COUNT 7
+#define DATA_MAX 7
 
 void serial_cb(const struct device *dev, void *user_data) {
     
@@ -40,6 +41,68 @@ void serial_cb(const struct device *dev, void *user_data) {
 	}
 }
 
+void parse_main(char **buf, EventMachine *em) {
+
+	sys_event_s speed_event{
+		.event_type = EV_SPEED,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s rpm_pct_event{
+		.event_type = EV_RPM_PCT,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s rpm_event{
+		.event_type = EV_RPM,
+		.payload { .int_p = 0 }
+	};
+
+	if (buf[2] != NULL) {
+		speed_event.payload.int_p = (int) strtol(buf[2], (char **)NULL, 10);  
+		em->call(speed_event);				
+	}
+
+	if (buf[4] != NULL) {
+		rpm_pct_event.payload.int_p = (int) strtol(buf[4], (char **)NULL, 10);  
+		em->call(rpm_pct_event);				
+	}
+
+	if (buf[3] != NULL) {
+		rpm_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10);  
+		em->call(rpm_event);				
+	}
+}
+
+void parse_gear(char **buf, EventMachine *em) {
+
+	sys_event_s gear_event{
+		.event_type = EV_GEAR,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s shift_event{
+		.event_type = EV_SHIFT,
+		.payload { .int_p = 0 }
+	};
+
+	if (buf[2] != NULL) {
+		if (buf[2][0] == 'N' || buf[2][0] == 'n') {
+			gear_event.payload.int_p = 0;
+		} else if (buf[2][0] == 'R' || buf[2][0] == 'r') {
+			gear_event.payload.int_p = -1;
+		} else {
+			gear_event.payload.int_p = (int) strtol(buf[2], (char **)NULL, 10);
+		}
+		em->call(gear_event);				
+	}
+
+	if (buf[3] != NULL && buf[4] != NULL) {
+		shift_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10) + (int) strtol(buf[4], (char **)NULL, 10);  
+		em->call(shift_event);		
+	}
+}
+
 void console_thread(void *p1, void *p2, void *p3) {
 
     int ret = uart_irq_callback_user_data_set(uart0, serial_cb, NULL);
@@ -58,72 +121,30 @@ void console_thread(void *p1, void *p2, void *p3) {
     char buf[64];
 
 	auto &em = EventMachine::get_machine();
-	sys_event_s speed_event{
-		.event_type = EV_SPEED,
-		.payload { .int_p = 0 }
-	};
-
-	sys_event_s gear_event{
-		.event_type = EV_GEAR,
-		.payload { .int_p = 0 }
-	};
-
-	sys_event_s shift_event{
-		.event_type = EV_SHIFT,
-		.payload { .int_p = 0 }
-	};
-
-	sys_event_s rpm_pct_event{
-		.event_type = EV_RPM_PCT,
-		.payload { .int_p = 0 }
-	};
-
-	sys_event_s rpm_event{
-		.event_type = EV_RPM,
-		.payload { .int_p = 0 }
-	};
-
+	
 	while (1) {
 		if (k_msgq_get(&uart_msgq, &buf, K_NO_WAIT) == 0) {
-			char *p[DATA_COUNT];
+			char *p[DATA_MAX];
 			
 			p[0] = strtok(buf, ";");
 
 			if (p[0] == NULL || p[0][0] != 'S' || p[0][1] != 'H') { continue; }
 
-			for (int i = 1; i < DATA_COUNT; i++) {
+			for (int i = 1; i < DATA_MAX; i++) {
 				p[i] = strtok(NULL, ";");
 			}
 
-			if (p[1] != NULL) {
-				if (p[1][0] == 'N' || p[1][0] == 'n') {
-					gear_event.payload.int_p = 0;
-				} else if (p[1][0] == 'R' || p[1][0] == 'r') {
-					gear_event.payload.int_p = -1;
-				} else {
-					gear_event.payload.int_p = (int) strtol(p[1], (char **)NULL, 10);
-				}
-				em.call(gear_event);				
-			}
-			
-			if (p[2] != NULL) {
-				speed_event.payload.int_p = (int) strtol(p[2], (char **)NULL, 10);  
-				em.call(speed_event);				
-			}
+			int msg_id = (int) strtol(p[1], (char **) NULL, 10);
 
-			if (p[3] != NULL && p[4] != NULL) {
-				shift_event.payload.int_p = (int) strtol(p[3], (char **)NULL, 10) + (int) strtol(p[4], (char **)NULL, 10);  
-				em.call(shift_event);		
-			}
-
-			if (p[5] != NULL) {
-				rpm_pct_event.payload.int_p = (int) strtol(p[5], (char **)NULL, 10);  
-				em.call(rpm_pct_event);				
-			}
-
-			if (p[6] != NULL) {
-				rpm_event.payload.int_p = (int) strtol(p[6], (char **)NULL, 10);  
-				em.call(rpm_event);				
+			switch (msg_id) {
+				case 1: {
+					parse_main(p, &em);
+					break;
+				};
+				case 2: {
+					parse_gear(p, &em);
+				};
+				default: break;
 			}
 		}
 		k_sleep(K_MSEC(10));

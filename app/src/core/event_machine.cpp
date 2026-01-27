@@ -29,7 +29,6 @@ bool EventMachine::remove_callback(sys_event_e type, int callback_id) {
 
 void EventMachine::call(sys_event_s event) {
   k_mutex_lock(&mutex, K_FOREVER);
-  bool result = false;
   for (auto& cb : callbacks[event.event_type]) {
     cb.second(event);
   }
