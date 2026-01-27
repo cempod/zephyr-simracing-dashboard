@@ -1,0 +1,44 @@
+{
+  "AutomaticReconnect": true,
+  "SerialPortName": "COM7",
+  "StartupDelayMs": 2000,
+  "IsConnecting": false,
+  "IsEnabled": true,
+  "LogIncomingData": true,
+  "IsConnected": true,
+  "BaudRate": 115200,
+  "DtrEnable": false,
+  "RtsEnable": false,
+  "EditorExpanded": true,
+  "Name": "Custom Serial device",
+  "Description": "Serial device",
+  "LastErrorDate": "2026-01-27T19:01:15.1524477+03:00",
+  "LastErrorMessage": null,
+  "IsFreezed": false,
+  "SettingsBuilder": {
+    "Settings": [],
+    "IsEditMode": false
+  },
+  "OnConnectMessage": {
+    "Expression": ""
+  },
+  "OnDisconnectMessage": {
+    "Expression": ""
+  },
+  "UpdateMessages": [
+    {
+      "Message": {
+        "Expression": "'SH;1;' + truncate([SpeedKmh]) + ';' + truncate([Rpms]) + ';' + truncate([CarSettings_CurrentDisplayedRPMPercent]) + '\\n'"
+      },
+      "IsEnabled": true,
+      "MaximumFrequency": 30
+    },
+    {
+      "Message": {
+        "Expression": "'SH;2;' + [Gear] + ';' + truncate([CarSettings_RPMShiftLight1]) + ';' + truncate([CarSettings_RPMShiftLight2]) + '\\n'"
+      },
+      "IsEnabled": true,
+      "MaximumFrequency": 0
+    }
+  ]
+}
