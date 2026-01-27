@@ -7,6 +7,12 @@ set(SRCS
     ${CMAKE_CURRENT_LIST_DIR}/ui/dash.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/digits.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/small_digits.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/icons/abs_icon.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/icons/brake_icon.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/icons/esp_icon.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/icons/fuel_icon.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/icons/left_turn_icon.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/icons/right_turn_icon.c
     ${CMAKE_CURRENT_LIST_DIR}/console.cpp
 )
 

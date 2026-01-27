@@ -2,6 +2,7 @@
 
 #include <lvgl.h>
 #include "event_machine.hpp"
+#include "misc/lv_color.h"
 
 class Dash {
     public:
@@ -31,4 +32,17 @@ class Dash {
         lv_obj_t * rpm_bar;
         lv_obj_t * rpm_label;
         lv_obj_t * rpm_label_title;
+        lv_obj_t * abs_img;
+        lv_obj_t * esp_img;
+        lv_obj_t * brake_img;
+        lv_obj_t * fuel_img;
+        lv_obj_t * fuel_bar;
+        lv_obj_t * left_turn_img;
+        lv_obj_t * right_turn_img;
+
+        lv_color_t color_main = lv_color_make(255, 255, 255);
+        lv_color_t color_disabled = lv_color_make(50, 50, 50);
+        lv_color_t color_attention = lv_color_make(255, 255, 0);
+        lv_color_t color_warning = lv_color_make(255, 0, 0);
+        lv_color_t color_green = lv_color_make(0, 255, 0);
 };

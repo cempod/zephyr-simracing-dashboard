@@ -35,21 +35,21 @@ Dash::Dash() {
     lv_label_set_text(gear_label, "N");
     lv_obj_set_style_text_font(gear_label, &digits, 0);
     lv_obj_set_style_text_align(gear_label, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_color(gear_label, lv_color_make(255, 255, 255), 0);
+    lv_obj_set_style_text_color(gear_label, color_main, 0);
     lv_obj_align(gear_label, LV_ALIGN_BOTTOM_MID, 0, -13);
 
     speed_label = lv_label_create(screen);
     lv_label_set_text(speed_label, "0");
     lv_obj_set_style_text_font(speed_label, &digits, 0);
     lv_obj_set_style_text_align(speed_label, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_color(speed_label, lv_color_make(255, 255, 255), 0);
+    lv_obj_set_style_text_color(speed_label, color_main, 0);
     lv_obj_align(speed_label, LV_ALIGN_CENTER, 0, 0);
 
     speed_label_title = lv_label_create(screen);
     lv_label_set_text(speed_label_title, "Km/h");
     lv_obj_set_style_text_font(speed_label_title, &lv_font_montserrat_14, 0);
     lv_obj_set_style_text_align(speed_label_title, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_color(speed_label_title, lv_color_make(255, 255, 255), 0);
+    lv_obj_set_style_text_color(speed_label_title, color_main, 0);
     lv_obj_align(speed_label_title, LV_ALIGN_CENTER, 0, 50);
 
     static lv_point_t line_left_points[] = { {0, 0 }, {99, 115}, {99, 220}, {0, 319} };
@@ -60,7 +60,7 @@ Dash::Dash() {
     static lv_style_t style_line;
     lv_style_init(&style_line);
     lv_style_set_line_width(&style_line, 2);
-    lv_style_set_line_color(&style_line, lv_color_make(255, 255, 255));
+    lv_style_set_line_color(&style_line, color_main);
     lv_style_set_line_rounded(&style_line, true);
 
     line_left = lv_line_create(screen);
@@ -84,26 +84,87 @@ Dash::Dash() {
     lv_obj_align(rpm_bar, LV_ALIGN_TOP_MID, 0, -20);
     lv_bar_set_range(rpm_bar, 0, 100);
     lv_obj_set_style_bg_opa(rpm_bar, LV_OPA_TRANSP, 0);
-    lv_obj_set_style_border_color(rpm_bar, lv_color_make(255, 255, 255), 0);
+    lv_obj_set_style_border_color(rpm_bar, color_main, 0);
     lv_obj_set_style_border_width(rpm_bar, 2, 0);
     lv_obj_set_style_border_opa(rpm_bar, LV_OPA_COVER, 0);
     lv_obj_set_style_radius(rpm_bar, 2, LV_PART_INDICATOR);
-    lv_obj_set_style_bg_color(rpm_bar, lv_color_make(255, 255, 255), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(rpm_bar, color_main, LV_PART_INDICATOR);
     lv_obj_set_style_pad_all(rpm_bar, 4, 0);
 
     rpm_label= lv_label_create(screen);
     lv_label_set_text(rpm_label, "0");
     lv_obj_set_style_text_font(rpm_label, &small_digits, 0);
     lv_obj_set_style_text_align(rpm_label, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_color(rpm_label, lv_color_make(255, 255, 255), 0);
+    lv_obj_set_style_text_color(rpm_label, color_main, 0);
     lv_obj_align(rpm_label, LV_ALIGN_TOP_MID, 0, 51);
 
     rpm_label_title = lv_label_create(screen);
     lv_label_set_text(rpm_label_title, "RPM");
     lv_obj_set_style_text_font(rpm_label_title, &lv_font_montserrat_14, 0);
     lv_obj_set_style_text_align(rpm_label_title, LV_TEXT_ALIGN_CENTER, 0);
-    lv_obj_set_style_text_color(rpm_label_title, lv_color_make(255, 255, 255), 0);
+    lv_obj_set_style_text_color(rpm_label_title, color_main, 0);
     lv_obj_align(rpm_label_title, LV_ALIGN_TOP_MID, 0, 28);
+
+    LV_IMG_DECLARE(abs_icon);
+    abs_img = lv_img_create(screen);
+    lv_img_set_src(abs_img, &abs_icon);
+    lv_obj_align(abs_img, LV_ALIGN_LEFT_MID, 5, 65);
+    lv_obj_set_size(abs_img, 48, 48);
+    lv_obj_set_style_img_recolor_opa(abs_img, LV_OPA_COVER, 0);
+    lv_obj_set_style_img_recolor(abs_img, color_disabled, 0);
+
+    LV_IMG_DECLARE(esp_icon);
+    esp_img = lv_img_create(screen);
+    lv_img_set_src(esp_img, &esp_icon);
+    lv_obj_align(esp_img, LV_ALIGN_LEFT_MID, 35, 0);
+    lv_obj_set_size(esp_img, 48, 48);
+    lv_obj_set_style_img_recolor_opa(esp_img, LV_OPA_COVER, 0);
+    lv_obj_set_style_img_recolor(esp_img, color_disabled, 0);
+
+    LV_IMG_DECLARE(brake_icon);
+    brake_img = lv_img_create(screen);
+    lv_img_set_src(brake_img, &brake_icon);
+    lv_obj_align(brake_img, LV_ALIGN_LEFT_MID, 5, -65);
+    lv_obj_set_size(brake_img, 48, 48);
+    lv_obj_set_style_img_recolor_opa(brake_img, LV_OPA_COVER, 0);
+    lv_obj_set_style_img_recolor(brake_img, color_disabled, 0);
+
+    LV_IMG_DECLARE(fuel_icon);
+    fuel_img = lv_img_create(screen);
+    lv_img_set_src(fuel_img, &fuel_icon);
+    lv_obj_align(fuel_img, LV_ALIGN_RIGHT_MID, -35, 0);
+    lv_obj_set_size(fuel_img, 48, 48);
+    lv_obj_set_style_img_recolor_opa(fuel_img, LV_OPA_COVER, 0);
+    lv_obj_set_style_img_recolor(fuel_img, color_main, 0);
+
+    fuel_bar = lv_bar_create(screen);
+    lv_obj_set_size(fuel_bar, 40, 200);
+    lv_obj_align(fuel_bar, LV_ALIGN_RIGHT_MID, 20, 0);
+    lv_bar_set_range(fuel_bar, 0, 100);
+    lv_obj_set_style_bg_opa(fuel_bar, LV_OPA_TRANSP, 0);
+    lv_obj_set_style_border_color(fuel_bar, color_main, 0);
+    lv_obj_set_style_border_width(fuel_bar, 2, 0);
+    lv_obj_set_style_border_opa(fuel_bar, LV_OPA_COVER, 0);
+    lv_obj_set_style_radius(fuel_bar, 2, LV_PART_INDICATOR);
+    lv_obj_set_style_bg_color(fuel_bar, color_main, LV_PART_INDICATOR);
+    lv_obj_set_style_pad_all(fuel_bar, 4, 0);
+    lv_bar_set_value(fuel_bar, 56, LV_ANIM_OFF);
+
+    LV_IMG_DECLARE(left_turn_icon);
+    left_turn_img = lv_img_create(screen);
+    lv_img_set_src(left_turn_img, &left_turn_icon);
+    lv_obj_align(left_turn_img, LV_ALIGN_TOP_LEFT, 40, 0);
+    lv_obj_set_size(left_turn_img, 48, 48);
+    lv_obj_set_style_img_recolor_opa(left_turn_img, LV_OPA_COVER, 0);
+    lv_obj_set_style_img_recolor(left_turn_img, color_disabled, 0);
+
+    LV_IMG_DECLARE(right_turn_icon);
+    right_turn_img = lv_img_create(screen);
+    lv_img_set_src(right_turn_img, &right_turn_icon);
+    lv_obj_align(right_turn_img, LV_ALIGN_TOP_RIGHT, -40, 0);
+    lv_obj_set_size(right_turn_img, 48, 48);
+    lv_obj_set_style_img_recolor_opa(right_turn_img, LV_OPA_COVER, 0);
+    lv_obj_set_style_img_recolor(right_turn_img, color_disabled, 0);
 
     auto &em = EventMachine::get_machine();
     em.register_callback(EV_SPEED, set_speed_callback);
@@ -132,7 +193,7 @@ void Dash::update() {
     } else if (shift == 2) {
         lv_obj_set_style_text_color(gear_label, lv_color_make(255, 0, 0), 0);
     } else {
-        lv_obj_set_style_text_color(gear_label, lv_color_make(255, 255, 255), 0);
+        lv_obj_set_style_text_color(gear_label, color_main, 0);
     }
     lv_bar_set_value(rpm_bar, rpm_pct, LV_ANIM_OFF);
     set_label_text(rpm_label, "%d", rpm);
