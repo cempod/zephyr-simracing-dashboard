@@ -103,6 +103,44 @@ void parse_gear(char **buf, EventMachine *em) {
 	}
 }
 
+void parse_systems(char **buf, EventMachine *em) {
+	sys_event_s brake_event{
+		.event_type = EV_HANDBRAKE,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s esp_event{
+		.event_type = EV_ESP,
+		.payload { .int_p = -1 }
+	};
+
+	sys_event_s abs_event{
+		.event_type = EV_ABS,
+		.payload { .int_p = -1 }
+	};
+
+	if (buf[6] != NULL) {
+		brake_event.payload.int_p = (int) strtol(buf[6], (char **)NULL, 10);
+		em->call(brake_event);
+	}
+
+	if (buf[2] != NULL && buf[3] != NULL) {
+		int abs_level = (int) strtol(buf[2], (char **)NULL, 10);
+		if (abs_level > 0) {
+			abs_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10);
+		}
+		em->call(abs_event);
+	}
+
+	if (buf[4] != NULL && buf[5] != NULL) {
+		int esp_level = (int) strtol(buf[4], (char **)NULL, 10);
+		if (esp_level > 0) {
+			esp_event.payload.int_p = (int) strtol(buf[5], (char **)NULL, 10);
+		}
+		em->call(esp_event);
+	}
+}
+
 void console_thread(void *p1, void *p2, void *p3) {
 
     int ret = uart_irq_callback_user_data_set(uart0, serial_cb, NULL);
@@ -143,7 +181,12 @@ void console_thread(void *p1, void *p2, void *p3) {
 				};
 				case 2: {
 					parse_gear(p, &em);
+					break;
 				};
+				case 3: {
+					parse_systems(p, &em);
+					break;
+				}
 				default: break;
 			}
 		}

@@ -16,11 +16,17 @@ class Dash {
         static void shift_callback(sys_event_s event);
         static void rpm_pct_callback(sys_event_s event);
         static void rpm_callback(sys_event_s event);
+        static void handbrake_callback(sys_event_s event);
+        static void esp_callback(sys_event_s event);
+        static void abs_callback(sys_event_s event);
         static inline int speed{};
         static inline int gear{};
         static inline int shift{};
         static inline int rpm_pct{};
         static inline int rpm{};
+        static inline int handbrake{};
+        static inline int esp{-1};
+        static inline int abs{-1};
         lv_obj_t * screen;
         lv_obj_t * gear_label;
         lv_obj_t * speed_label;

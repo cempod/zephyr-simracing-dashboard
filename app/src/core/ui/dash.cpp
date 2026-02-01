@@ -172,6 +172,9 @@ Dash::Dash() {
     em.register_callback(EV_SHIFT, shift_callback);
     em.register_callback(EV_RPM, rpm_callback);
     em.register_callback(EV_RPM_PCT, rpm_pct_callback);
+    em.register_callback(EV_HANDBRAKE, handbrake_callback);
+    em.register_callback(EV_ESP, esp_callback);
+    em.register_callback(EV_ABS, abs_callback);
 }
 
 void Dash::load() {
@@ -197,6 +200,28 @@ void Dash::update() {
     }
     lv_bar_set_value(rpm_bar, rpm_pct, LV_ANIM_OFF);
     set_label_text(rpm_label, "%d", rpm);
+
+    if (handbrake == 1) {
+        lv_obj_set_style_img_recolor(brake_img, color_warning, 0);
+    } else {
+        lv_obj_set_style_img_recolor(brake_img, color_disabled, 0);
+    }
+
+    if (esp < 0) {
+        lv_obj_set_style_img_recolor(esp_img, color_disabled, 0);
+    } else if (esp == 0) {
+        lv_obj_set_style_img_recolor(esp_img, color_main, 0);
+    } else {
+        lv_obj_set_style_img_recolor(esp_img, color_attention, 0);
+    }
+
+    if (abs < 0) {
+        lv_obj_set_style_img_recolor(abs_img, color_disabled, 0);
+    } else if (abs == 0) {
+        lv_obj_set_style_img_recolor(abs_img, color_main, 0);
+    } else {
+        lv_obj_set_style_img_recolor(abs_img, color_attention, 0);
+    }
 }
 
 void Dash::set_speed_callback(sys_event_s event) {
@@ -226,5 +251,23 @@ void Dash::rpm_callback(sys_event_s event) {
 void Dash::rpm_pct_callback(sys_event_s event) {
     if (event.event_type == EV_RPM_PCT) {
         rpm_pct = event.payload.int_p;
+    }
+}
+
+void Dash::handbrake_callback(sys_event_s event) {
+    if (event.event_type == EV_HANDBRAKE) {
+        handbrake = event.payload.int_p;
+    }
+}
+
+void Dash::esp_callback(sys_event_s event) {
+    if (event.event_type == EV_ESP) {
+        esp = event.payload.int_p;
+    }
+}
+
+void Dash::abs_callback(sys_event_s event) {
+    if (event.event_type == EV_ABS) {
+        abs = event.payload.int_p;
     }
 }
