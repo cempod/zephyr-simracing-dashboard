@@ -16,6 +16,10 @@ enum sys_event_e {
     EV_HANDBRAKE,
     EV_ESP,
     EV_ABS,
+    EV_TURN,
+    EV_BEAM,
+    EV_FUEL_PCT,
+    EV_FUEL_ALARM,
     EV_COUNT
 };
 

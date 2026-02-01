@@ -175,6 +175,10 @@ Dash::Dash() {
     em.register_callback(EV_HANDBRAKE, handbrake_callback);
     em.register_callback(EV_ESP, esp_callback);
     em.register_callback(EV_ABS, abs_callback);
+    em.register_callback(EV_TURN, turn_callback);
+    em.register_callback(EV_BEAM, beam_callback);
+    em.register_callback(EV_FUEL_PCT, fuel_pct_callback);
+    em.register_callback(EV_FUEL_ALARM, fuel_alarm_callback);
 }
 
 void Dash::load() {
@@ -221,6 +225,24 @@ void Dash::update() {
         lv_obj_set_style_img_recolor(abs_img, color_main, 0);
     } else {
         lv_obj_set_style_img_recolor(abs_img, color_attention, 0);
+    }
+
+    if ((turn_lights | 0x01) == turn_lights) {
+        lv_obj_set_style_img_recolor(left_turn_img, color_green, 0);
+    } else {
+        lv_obj_set_style_img_recolor(left_turn_img, color_disabled, 0);
+    }
+    if ((turn_lights | 0x02) == turn_lights) {
+        lv_obj_set_style_img_recolor(right_turn_img, color_green, 0);
+    } else {
+        lv_obj_set_style_img_recolor(right_turn_img, color_disabled, 0);
+    }
+
+    lv_bar_set_value(fuel_bar, fuel_pct, LV_ANIM_OFF);
+    if (fuel_alarm > 0) {
+        lv_obj_set_style_img_recolor(fuel_img, color_warning, 0);
+    } else {
+        lv_obj_set_style_img_recolor(fuel_bar, color_main, 0);
     }
 }
 
@@ -269,5 +291,29 @@ void Dash::esp_callback(sys_event_s event) {
 void Dash::abs_callback(sys_event_s event) {
     if (event.event_type == EV_ABS) {
         abs = event.payload.int_p;
+    }
+}
+
+void Dash::turn_callback(sys_event_s event) {
+    if (event.event_type == EV_TURN) {
+        turn_lights = event.payload.int_p;
+    }
+}
+
+void Dash::beam_callback(sys_event_s event) {
+    if (event.event_type == EV_BEAM) {
+        beam = event.payload.int_p;
+    }
+}
+
+void Dash::fuel_pct_callback(sys_event_s event) {
+    if (event.event_type == EV_FUEL_PCT) {
+        fuel_pct = event.payload.int_p;
+    }
+}
+
+void Dash::fuel_alarm_callback(sys_event_s event) {
+    if (event.event_type == EV_FUEL_ALARM) {
+        fuel_alarm = event.payload.int_p;
     }
 }

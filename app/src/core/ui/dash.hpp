@@ -19,6 +19,10 @@ class Dash {
         static void handbrake_callback(sys_event_s event);
         static void esp_callback(sys_event_s event);
         static void abs_callback(sys_event_s event);
+        static void turn_callback(sys_event_s event);
+        static void beam_callback(sys_event_s event);
+        static void fuel_pct_callback(sys_event_s event);
+        static void fuel_alarm_callback(sys_event_s event);
         static inline int speed{};
         static inline int gear{};
         static inline int shift{};
@@ -27,6 +31,10 @@ class Dash {
         static inline int handbrake{};
         static inline int esp{-1};
         static inline int abs{-1};
+        static inline int turn_lights{0};
+        static inline int beam{0};
+        static inline int fuel_pct{0};
+        static inline int fuel_alarm{0};
         lv_obj_t * screen;
         lv_obj_t * gear_label;
         lv_obj_t * speed_label;

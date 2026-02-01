@@ -141,6 +141,58 @@ void parse_systems(char **buf, EventMachine *em) {
 	}
 }
 
+void parse_lights(char **buf, EventMachine *em) { 
+	sys_event_s turn_event{
+		.event_type = EV_TURN,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s beam_event{
+		.event_type = EV_BEAM,
+		.payload { .int_p = 0 }
+	};
+
+	if (buf[2] != NULL && buf[3] != NULL) {
+		int left_turn = (int) strtol(buf[2], (char **)NULL, 10);
+		int right_turn = (int) strtol(buf[3], (char **)NULL, 10);
+		turn_event.payload.int_p = left_turn + (right_turn << 1);
+
+		em->call(turn_event);
+	}
+
+	if (buf[4] != NULL && buf[5] != NULL) {
+		int low_beam = (int) strtol(buf[4], (char **)NULL, 10);
+		int high_beam = (int) strtol(buf[5], (char **)NULL, 10);
+		beam_event.payload.int_p = low_beam + (high_beam << 1);
+
+		em->call(beam_event);
+	}
+}
+
+void parse_fuel(char **buf, EventMachine *em) {
+	sys_event_s fuel_pct_event{
+		.event_type = EV_FUEL_PCT,
+		.payload { .int_p = 0 }
+	};
+
+	sys_event_s fuel_alarm_event{
+		.event_type = EV_FUEL_ALARM,
+		.payload { .int_p = 0 }
+	};
+
+	if (buf[2] != NULL) {
+		fuel_pct_event.payload.int_p = (int) strtol(buf[2], (char **)NULL, 10);
+
+		em->call(fuel_pct_event);
+	}
+
+	if (buf[3] != NULL) {
+		fuel_alarm_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10);
+
+		em->call(fuel_alarm_event);
+	}
+}
+
 void console_thread(void *p1, void *p2, void *p3) {
 
     int ret = uart_irq_callback_user_data_set(uart0, serial_cb, NULL);
@@ -178,13 +230,21 @@ void console_thread(void *p1, void *p2, void *p3) {
 				case 1: {
 					parse_main(p, &em);
 					break;
-				};
+				}
 				case 2: {
 					parse_gear(p, &em);
 					break;
-				};
+				}
 				case 3: {
 					parse_systems(p, &em);
+					break;
+				}
+				case 4: {
+					parse_lights(p, &em);
+					break;
+				}
+				case 5: {
+					parse_fuel(p, &em);
 					break;
 				}
 				default: break;

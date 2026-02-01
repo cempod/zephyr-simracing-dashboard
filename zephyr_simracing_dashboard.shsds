@@ -12,7 +12,7 @@
   "EditorExpanded": true,
   "Name": "Custom Serial device",
   "Description": "Serial device",
-  "LastErrorDate": "2026-01-27T19:01:15.1524477+03:00",
+  "LastErrorDate": "2026-02-01T13:35:43.8416087+03:00",
   "LastErrorMessage": null,
   "IsFreezed": false,
   "SettingsBuilder": {
@@ -36,6 +36,27 @@
     {
       "Message": {
         "Expression": "'SH;2;' + [Gear] + ';' + truncate([CarSettings_RPMShiftLight1]) + ';' + truncate([CarSettings_RPMShiftLight2]) + '\\n'"
+      },
+      "IsEnabled": true,
+      "MaximumFrequency": 0
+    },
+    {
+      "Message": {
+        "Expression": "'SH;3;' + [ABSLevel] + ';' + [ABSActive] + ';' + [TCLevel] + ';' + [TCActive] + ';' + max([Handbrake], if([GameRawData.TruckValues.CurrentValues.MotorValues.BrakeValues.ParkingBrake],1, 0)) + '\\n'"
+      },
+      "IsEnabled": true,
+      "MaximumFrequency": 0
+    },
+    {
+      "Message": {
+        "Expression": "'SH;4;' + [TurnIndicatorLeft] + ';' + [TurnIndicatorRight] + ';' + if([GameRawData.TruckValues.CurrentValues.LightsValues.BeamLow], 1, 0) + ';' + if([GameRawData.TruckValues.CurrentValues.LightsValues.BeamHigh], 1, 0) + '\\n'"
+      },
+      "IsEnabled": true,
+      "MaximumFrequency": 0
+    },
+    {
+      "Message": {
+        "Expression": "'SH;5;' + truncate([FuelPercent]) + ';' + [CarSettings_FuelAlertActive] + '\\n'"
       },
       "IsEnabled": true,
       "MaximumFrequency": 0
