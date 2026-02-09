@@ -2,7 +2,6 @@
 
 #include <lvgl.h>
 #include "event_machine.hpp"
-#include "misc/lv_color.h"
 
 class Dash {
     public:
@@ -11,30 +10,30 @@ class Dash {
         void update();
     private:
         Dash();
-        static void set_speed_callback(sys_event_s event);
-        static void set_gear_callback(sys_event_s event);
-        static void shift_callback(sys_event_s event);
-        static void rpm_pct_callback(sys_event_s event);
-        static void rpm_callback(sys_event_s event);
-        static void handbrake_callback(sys_event_s event);
-        static void esp_callback(sys_event_s event);
-        static void abs_callback(sys_event_s event);
-        static void turn_callback(sys_event_s event);
-        static void beam_callback(sys_event_s event);
-        static void fuel_pct_callback(sys_event_s event);
-        static void fuel_alarm_callback(sys_event_s event);
-        static inline int speed{};
-        static inline int gear{};
-        static inline int shift{};
-        static inline int rpm_pct{};
-        static inline int rpm{};
-        static inline int handbrake{};
-        static inline int esp{-1};
-        static inline int abs{-1};
-        static inline int turn_lights{0};
-        static inline int beam{0};
-        static inline int fuel_pct{0};
-        static inline int fuel_alarm{0};
+        static Dash* instance;
+        #define DECLARE_EVENT(name, sys_event_e, default_value) \
+            int name##_ = default_value; \
+            static inline void name##_callback(sys_event_s event) { \
+                if (instance && event.event_type == sys_event_e) { \
+                    instance->name##_ = event.payload.int_p; \
+                } \
+            } \
+        
+        DECLARE_EVENT(speed, EV_SPEED, 0);
+        DECLARE_EVENT(gear, EV_GEAR, 0);
+        DECLARE_EVENT(shift, EV_SHIFT, 0);
+        DECLARE_EVENT(rpm, EV_RPM, 0);
+        DECLARE_EVENT(rpm_pct, EV_RPM_PCT, 0);
+        DECLARE_EVENT(handbrake, EV_HANDBRAKE, 0);
+        DECLARE_EVENT(esp, EV_ESP, -1);
+        DECLARE_EVENT(abs, EV_ABS, -1);
+        DECLARE_EVENT(turn_lights, EV_TURN, 0);
+        DECLARE_EVENT(beam, EV_BEAM, 0);
+        DECLARE_EVENT(fuel_pct, EV_FUEL_PCT, 0);
+        DECLARE_EVENT(fuel_alarm, EV_FUEL_ALARM, 0);
+    
+        #undef DECLARE_EVENT
+        
         lv_obj_t * screen;
         lv_obj_t * gear_label;
         lv_obj_t * speed_label;
@@ -53,10 +52,4 @@ class Dash {
         lv_obj_t * fuel_bar;
         lv_obj_t * left_turn_img;
         lv_obj_t * right_turn_img;
-
-        lv_color_t color_main = lv_color_make(255, 255, 255);
-        lv_color_t color_disabled = lv_color_make(50, 50, 50);
-        lv_color_t color_attention = lv_color_make(255, 255, 0);
-        lv_color_t color_warning = lv_color_make(255, 0, 0);
-        lv_color_t color_green = lv_color_make(0, 255, 0);
 };

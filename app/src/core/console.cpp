@@ -10,9 +10,13 @@
 LOG_MODULE_REGISTER(CONSOLE);
 
 const struct device *uart0 = DEVICE_DT_GET(DT_NODELABEL(uart0));
-K_MSGQ_DEFINE(uart_msgq, 20, 10, 4);
+K_MSGQ_DEFINE(uart_msgq, 64, 10, 4);
 
-#define DATA_MAX 7
+struct ParseContext {
+    char** tokens;
+    int count;
+    EventMachine& em;
+};
 
 void serial_cb(const struct device *dev, void *user_data) {
     
@@ -41,156 +45,100 @@ void serial_cb(const struct device *dev, void *user_data) {
 	}
 }
 
-void parse_main(char **buf, EventMachine *em) {
-
-	sys_event_s speed_event{
-		.event_type = EV_SPEED,
-		.payload { .int_p = 0 }
-	};
-
-	sys_event_s rpm_pct_event{
-		.event_type = EV_RPM_PCT,
-		.payload { .int_p = 0 }
-	};
-
-	sys_event_s rpm_event{
-		.event_type = EV_RPM,
-		.payload { .int_p = 0 }
-	};
-
-	if (buf[2] != NULL) {
-		speed_event.payload.int_p = (int) strtol(buf[2], (char **)NULL, 10);  
-		em->call(speed_event);				
-	}
-
-	if (buf[4] != NULL) {
-		rpm_pct_event.payload.int_p = (int) strtol(buf[4], (char **)NULL, 10);  
-		em->call(rpm_pct_event);				
-	}
-
-	if (buf[3] != NULL) {
-		rpm_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10);  
-		em->call(rpm_event);				
-	}
+static int parse_int(const char* str, int default_val = 0) {
+    if (str == nullptr) return default_val;
+    
+    char* endptr;
+    long val = strtol(str, &endptr, 10);
+    
+    if (endptr == str || *endptr != '\0') {
+        return default_val;
+    }
+    
+    if (val < INT_MIN || val > INT_MAX) {
+        return default_val;
+    }
+    
+    return (int) val;
 }
 
-void parse_gear(char **buf, EventMachine *em) {
-
-	sys_event_s gear_event{
-		.event_type = EV_GEAR,
-		.payload { .int_p = 0 }
-	};
-
-	sys_event_s shift_event{
-		.event_type = EV_SHIFT,
-		.payload { .int_p = 0 }
-	};
-
-	if (buf[2] != NULL) {
-		if (buf[2][0] == 'N' || buf[2][0] == 'n') {
-			gear_event.payload.int_p = 0;
-		} else if (buf[2][0] == 'R' || buf[2][0] == 'r') {
-			gear_event.payload.int_p = -1;
-		} else {
-			gear_event.payload.int_p = (int) strtol(buf[2], (char **)NULL, 10);
-		}
-		em->call(gear_event);				
-	}
-
-	if (buf[3] != NULL && buf[4] != NULL) {
-		shift_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10) + (int) strtol(buf[4], (char **)NULL, 10);  
-		em->call(shift_event);		
-	}
+static sys_event_s create_int_event(sys_event_e event_type, int value) {
+    return sys_event_s{
+        .event_type = event_type,
+        .payload = { .int_p = value }
+    };
 }
 
-void parse_systems(char **buf, EventMachine *em) {
-	sys_event_s brake_event{
-		.event_type = EV_HANDBRAKE,
-		.payload { .int_p = 0 }
-	};
+void parse_main(const ParseContext& ctx) {
+	if (ctx.count < MSG_MAIN_SIZE) return;
 
-	sys_event_s esp_event{
-		.event_type = EV_ESP,
-		.payload { .int_p = -1 }
-	};
-
-	sys_event_s abs_event{
-		.event_type = EV_ABS,
-		.payload { .int_p = -1 }
-	};
-
-	if (buf[6] != NULL) {
-		brake_event.payload.int_p = (int) strtol(buf[6], (char **)NULL, 10);
-		em->call(brake_event);
-	}
-
-	if (buf[2] != NULL && buf[3] != NULL) {
-		int abs_level = (int) strtol(buf[2], (char **)NULL, 10);
-		if (abs_level > 0) {
-			abs_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10);
-		}
-		em->call(abs_event);
-	}
-
-	if (buf[4] != NULL && buf[5] != NULL) {
-		int esp_level = (int) strtol(buf[4], (char **)NULL, 10);
-		if (esp_level > 0) {
-			esp_event.payload.int_p = (int) strtol(buf[5], (char **)NULL, 10);
-		}
-		em->call(esp_event);
-	}
+	ctx.em.call(create_int_event(EV_SPEED, parse_int(ctx.tokens[IDX_SPEED])));				
+	ctx.em.call(create_int_event(EV_RPM_PCT, parse_int(ctx.tokens[IDX_RPM_PCT])));				
+	ctx.em.call(create_int_event(EV_RPM, parse_int(ctx.tokens[IDX_RPM])));
 }
 
-void parse_lights(char **buf, EventMachine *em) { 
-	sys_event_s turn_event{
-		.event_type = EV_TURN,
-		.payload { .int_p = 0 }
-	};
+void parse_gear(const ParseContext& ctx) {
+	if (ctx.count < MSG_GEAR_SIZE) return;
 
-	sys_event_s beam_event{
-		.event_type = EV_BEAM,
-		.payload { .int_p = 0 }
-	};
+	int gear_value = 0;
+	char gear_char = ctx.tokens[IDX_GEAR][0];
 
-	if (buf[2] != NULL && buf[3] != NULL) {
-		int left_turn = (int) strtol(buf[2], (char **)NULL, 10);
-		int right_turn = (int) strtol(buf[3], (char **)NULL, 10);
-		turn_event.payload.int_p = left_turn + (right_turn << 1);
-
-		em->call(turn_event);
+	switch (gear_char) {
+		case 'N':
+        case 'n':
+            gear_value = 0;
+            break;
+        case 'R':
+        case 'r':
+            gear_value = -1;
+            break;
+        default:
+            gear_value = parse_int(ctx.tokens[IDX_GEAR], 0);
+            break;
 	}
-
-	if (buf[4] != NULL && buf[5] != NULL) {
-		int low_beam = (int) strtol(buf[4], (char **)NULL, 10);
-		int high_beam = (int) strtol(buf[5], (char **)NULL, 10);
-		beam_event.payload.int_p = low_beam + (high_beam << 1);
-
-		em->call(beam_event);
-	}
+	ctx.em.call(create_int_event(EV_GEAR, gear_value));
+	ctx.em.call(create_int_event(EV_SHIFT, parse_int(ctx.tokens[IDX_SHIFT_ATTENTION]) + parse_int(ctx.tokens[IDX_SHIFT_WARNING])));		
 }
 
-void parse_fuel(char **buf, EventMachine *em) {
-	sys_event_s fuel_pct_event{
-		.event_type = EV_FUEL_PCT,
-		.payload { .int_p = 0 }
-	};
+void parse_systems(const ParseContext& ctx) {
+	if (ctx.count < MSG_SYSTEMS_SIZE) return;
 
-	sys_event_s fuel_alarm_event{
-		.event_type = EV_FUEL_ALARM,
-		.payload { .int_p = 0 }
-	};
+	ctx.em.call(create_int_event(EV_HANDBRAKE, parse_int(ctx.tokens[IDX_HANDBRAKE])));
 
-	if (buf[2] != NULL) {
-		fuel_pct_event.payload.int_p = (int) strtol(buf[2], (char **)NULL, 10);
-
-		em->call(fuel_pct_event);
+	int abs_level = parse_int(ctx.tokens[IDX_ABS_LEVEL]);
+	int abs_event = parse_int(ctx.tokens[IDX_ABS_EVENT]);
+	if (!abs_event && !abs_level) {
+		abs_event = -1;
 	}
+	ctx.em.call(create_int_event(EV_ABS, abs_event));
 
-	if (buf[3] != NULL) {
-		fuel_alarm_event.payload.int_p = (int) strtol(buf[3], (char **)NULL, 10);
-
-		em->call(fuel_alarm_event);
+	int esp_level = parse_int(ctx.tokens[IDX_ESP_LEVEL]);
+	int esp_event = parse_int(ctx.tokens[IDX_ESP_EVENT]);
+	if (!esp_level && !esp_event) {
+		esp_event = -1;
 	}
+	ctx.em.call(create_int_event(EV_ESP, esp_event));
+}
+
+void parse_lights(const ParseContext& ctx) {
+	if (ctx.count < MSG_LIGHTS_SIZE) return;
+
+	int left_turn = parse_int(ctx.tokens[IDX_TURN_LEFT]);
+	int right_turn = parse_int(ctx.tokens[IDX_TURN_RIGHT]);
+
+	ctx.em.call(create_int_event(EV_TURN, left_turn + (right_turn << 1)));
+
+	int low_beam = parse_int(ctx.tokens[IDX_BEAM_LOW]);
+	int high_beam = parse_int(ctx.tokens[IDX_BEAM_HIGH]);
+
+	ctx.em.call(create_int_event(EV_BEAM, low_beam + (high_beam << 1)));
+}
+
+void parse_fuel(const ParseContext& ctx) {
+	if (ctx.count < MSG_FUEL_SIZE) return;
+
+	ctx.em.call(create_int_event(EV_FUEL_PCT, parse_int(ctx.tokens[IDX_FUEL_PCT])));
+	ctx.em.call(create_int_event(EV_FUEL_ALARM, parse_int(ctx.tokens[IDX_FUEL_ALARM])));
 }
 
 void console_thread(void *p1, void *p2, void *p3) {
@@ -214,39 +162,33 @@ void console_thread(void *p1, void *p2, void *p3) {
 	
 	while (1) {
 		if (k_msgq_get(&uart_msgq, &buf, K_NO_WAIT) == 0) {
-			char *p[DATA_MAX];
+
+			constexpr int MAX_TOKENS = 10;
+			char *tokens[MAX_TOKENS];
+			int token_count = 0;
 			
-			p[0] = strtok(buf, ";");
+			char* token = strtok(buf, ";");
+            while (token != NULL && token_count < MAX_TOKENS) {
+                tokens[token_count++] = token;
+                token = strtok(NULL, ";");
+            }
 
-			if (p[0] == NULL || p[0][0] != 'S' || p[0][1] != 'H') { continue; }
+			if (token_count < 2 || tokens[0][0] != 'S' || tokens[0][1] != 'H') { continue; }
 
-			for (int i = 1; i < DATA_MAX; i++) {
-				p[i] = strtok(NULL, ";");
-			}
+			const ParseContext ctx = {
+				.tokens = tokens,
+				.count = token_count,
+				.em = em
+			};
 
-			int msg_id = (int) strtol(p[1], (char **) NULL, 10);
+			int msg_id = parse_int(tokens[1]);
 
 			switch (msg_id) {
-				case 1: {
-					parse_main(p, &em);
-					break;
-				}
-				case 2: {
-					parse_gear(p, &em);
-					break;
-				}
-				case 3: {
-					parse_systems(p, &em);
-					break;
-				}
-				case 4: {
-					parse_lights(p, &em);
-					break;
-				}
-				case 5: {
-					parse_fuel(p, &em);
-					break;
-				}
+				case MSG_MAIN: parse_main(ctx); break;
+				case MSG_GEAR: parse_gear(ctx); break;
+				case MSG_SYSTEMS: parse_systems(ctx); break;
+				case MSG_LIGHTS: parse_lights(ctx); break;
+				case MSG_FUEL: parse_fuel(ctx); break;
 				default: break;
 			}
 		}
