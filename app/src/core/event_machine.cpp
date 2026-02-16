@@ -1,36 +1,43 @@
 #include "event_machine.hpp"
 
 EventMachine& EventMachine::get_machine() {
-  static EventMachine machine;
-  return machine;
+    static EventMachine machine;
+    return machine;
 }
 
-int EventMachine::register_callback(sys_event_e type, CallbackFunc callback) {
-  k_mutex_lock(&mutex, K_FOREVER);
-  callbacks[type][next_cb_id] = callback;
-  next_cb_id++;
-  k_mutex_unlock(&mutex);
+sys_event_token EventMachine::register_callback(sys_event_e type, CallbackFunc callback) {
+    k_mutex_lock(&mutex, K_FOREVER);
+    int new_id;
+    if (!free_ids.empty()) {
+        new_id = free_ids.back();
+        free_ids.pop_back();
+    } else {
+        new_id = next_cb_id++;
+    }
+    callbacks[type][new_id] = callback;
+    k_mutex_unlock(&mutex);
 
-  return next_cb_id - 1;
+    return {type, new_id};
 }
 
-bool EventMachine::remove_callback(sys_event_e type, int callback_id) {
-  k_mutex_lock(&mutex, K_FOREVER);
-  bool result = false;
-  auto it = callbacks[type].find(callback_id);
-  if (it != callbacks[type].end()) {
-      callbacks[type].erase(it);
-      result = true;
-  }
-  k_mutex_unlock(&mutex);
+bool EventMachine::remove_callback(sys_event_token event_token) {
+    k_mutex_lock(&mutex, K_FOREVER);
+    bool result = false;
+    auto it = callbacks[event_token.event_type].find(event_token.event_id);
+    if (it != callbacks[event_token.event_type].end()) {
+        callbacks[event_token.event_type].erase(it);
+        free_ids.push_back(event_token.event_id);
+        result = true;
+    }
+    k_mutex_unlock(&mutex);
 
-  return result;
+    return result;
 }
 
 void EventMachine::call(sys_event_s event) {
-  k_mutex_lock(&mutex, K_FOREVER);
-  for (auto& cb : callbacks[event.event_type]) {
-    cb.second(event);
-  }
-  k_mutex_unlock(&mutex);
+    k_mutex_lock(&mutex, K_FOREVER);
+    for (auto& cb : callbacks[event.event_type]) {
+        cb.second(event);
+    }
+    k_mutex_unlock(&mutex);
 }

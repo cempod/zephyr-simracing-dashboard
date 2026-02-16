@@ -1,39 +1,36 @@
-#include "dash.hpp"
+#include "main_dash.hpp"
 #include "dash_colors.hpp"
-#include "core/lv_obj.h"
-#include "core/lv_obj_style.h"
 #include "event_machine.hpp"
-#include "font/lv_font.h"
-#include "misc/lv_anim.h"
-#include "misc/lv_area.h"
-#include "misc/lv_color.h"
-#include "widgets/lv_bar.h"
-#include "widgets/lv_label.h"
+#include "screen_base.hpp"
+
+#include "screen_manager.hpp"
 
 LV_FONT_DECLARE(digits)
 LV_FONT_DECLARE(small_digits)
 
-Dash* Dash::instance = nullptr;
+MainDash* MainDash::instance = nullptr;
 
-static inline void set_label_text(lv_obj_t * label, const char* msg, ...) {
-    char str[50];
-    va_list ap;
-    va_start(ap, msg);
-    vsnprintf(str, sizeof(str), msg, ap);
-    va_end(ap);
-    lv_label_set_text(label, str);
-}
-
-Dash& Dash::get_dash() {
-    static Dash dash;
+MainDash& MainDash::get() {
+    static MainDash dash;
     return dash;
 }
 
-Dash::Dash() {
+static void screen_gesture_event(lv_event_t * e) {
+    lv_obj_t * screen = lv_event_get_current_target(e);
+    lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
+    switch(dir) {
+        case LV_DIR_BOTTOM:
+            ScreenManager::get().set_screen(ScreenType::SettingsScreen);
+        break;
+    }
+}
+
+MainDash::MainDash() {
     instance = this;
     screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(screen, lv_color_make(0, 0, 0), 0);
     lv_obj_clear_flag(screen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(screen, screen_gesture_event, LV_EVENT_GESTURE, NULL);
 
     gear_label= lv_label_create(screen);
     lv_label_set_text(gear_label, "N");
@@ -169,86 +166,83 @@ Dash::Dash() {
     lv_obj_set_size(right_turn_img, 48, 48);
     lv_obj_set_style_img_recolor_opa(right_turn_img, LV_OPA_COVER, 0);
     lv_obj_set_style_img_recolor(right_turn_img, DASH_COLOR_DISABLED, 0);
-
-    auto &em = EventMachine::get_machine();
-    em.register_callback(EV_SPEED, speed_callback);
-    em.register_callback(EV_GEAR, gear_callback);
-    em.register_callback(EV_SHIFT, shift_callback);
-    em.register_callback(EV_RPM, rpm_callback);
-    em.register_callback(EV_RPM_PCT, rpm_pct_callback);
-    em.register_callback(EV_HANDBRAKE, handbrake_callback);
-    em.register_callback(EV_ESP, esp_callback);
-    em.register_callback(EV_ABS, abs_callback);
-    em.register_callback(EV_TURN, turn_lights_callback);
-    em.register_callback(EV_FUEL_PCT, fuel_pct_callback);
-    em.register_callback(EV_FUEL_ALARM, fuel_alarm_callback);
 }
 
-void Dash::load() {
-    lv_scr_load(screen);
+void MainDash::update_callbacks() {
+    register_callback(EV_SPEED, speed_callback);
+    register_callback(EV_GEAR, gear_callback);
+    register_callback(EV_SHIFT, shift_callback);
+    register_callback(EV_RPM, rpm_callback);
+    register_callback(EV_RPM_PCT, rpm_pct_callback);
+    register_callback(EV_HANDBRAKE, handbrake_callback);
+    register_callback(EV_ESP, esp_callback);
+    register_callback(EV_ABS, abs_callback);
+    register_callback(EV_TURN, turn_lights_callback);
+    register_callback(EV_FUEL_PCT, fuel_pct_callback);
+    register_callback(EV_FUEL_ALARM, fuel_alarm_callback);
 }
 
-void Dash::update() {
+void MainDash::update() {
     set_label_text(speed_label, "%d", speed_);
     
     if (gear_ == 0) {
-            set_label_text(gear_label, "N");
-        } else if (gear_ == -1) {
-            set_label_text(gear_label, "R");
-        } else {
-            set_label_text(gear_label, "%d", gear_);
-        }
+        set_label_text(gear_label, "N");
+    } else if (gear_ == -1) {
+        set_label_text(gear_label, "R");
+    } else {
+        set_label_text(gear_label, "%d", gear_);
+    }
 
     if (shift_ == 1) {
-            lv_obj_set_style_text_color(gear_label, DASH_COLOR_ATTENTION, 0);
-        } else if (shift_ == 2) {
-            lv_obj_set_style_text_color(gear_label, DASH_COLOR_WARNING, 0);
-        } else {
-            lv_obj_set_style_text_color(gear_label, DASH_COLOR_MAIN, 0);
-        }
+        lv_obj_set_style_text_color(gear_label, DASH_COLOR_ATTENTION, 0);
+    } else if (shift_ == 2) {
+        lv_obj_set_style_text_color(gear_label, DASH_COLOR_WARNING, 0);
+    } else {
+        lv_obj_set_style_text_color(gear_label, DASH_COLOR_MAIN, 0);
+    }
 
     set_label_text(rpm_label, "%d", rpm_);
 
     lv_bar_set_value(rpm_bar, rpm_pct_, LV_ANIM_OFF);
 
     if (handbrake_ == 1) {
-            lv_obj_set_style_img_recolor(brake_img, DASH_COLOR_WARNING, 0);
-        } else {
-            lv_obj_set_style_img_recolor(brake_img, DASH_COLOR_DISABLED, 0);
-        }
+        lv_obj_set_style_img_recolor(brake_img, DASH_COLOR_WARNING, 0);
+    } else {
+        lv_obj_set_style_img_recolor(brake_img, DASH_COLOR_DISABLED, 0);
+    }
 
     if (esp_ < 0) {
-            lv_obj_set_style_img_recolor(esp_img, DASH_COLOR_DISABLED, 0);
-        } else if (esp_ == 0) {
-            lv_obj_set_style_img_recolor(esp_img, DASH_COLOR_MAIN, 0);
-        } else {
-            lv_obj_set_style_img_recolor(esp_img, DASH_COLOR_ATTENTION, 0);
-        }
+        lv_obj_set_style_img_recolor(esp_img, DASH_COLOR_DISABLED, 0);
+    } else if (esp_ == 0) {
+        lv_obj_set_style_img_recolor(esp_img, DASH_COLOR_MAIN, 0);
+    } else {
+        lv_obj_set_style_img_recolor(esp_img, DASH_COLOR_ATTENTION, 0);
+    }
 
     if (abs_ < 0) {
-            lv_obj_set_style_img_recolor(abs_img, DASH_COLOR_DISABLED, 0);
-        } else if (abs_ == 0) {
-            lv_obj_set_style_img_recolor(abs_img, DASH_COLOR_MAIN, 0);
-        } else {
-            lv_obj_set_style_img_recolor(abs_img, DASH_COLOR_ATTENTION, 0);
-        }
+        lv_obj_set_style_img_recolor(abs_img, DASH_COLOR_DISABLED, 0);
+    } else if (abs_ == 0) {
+        lv_obj_set_style_img_recolor(abs_img, DASH_COLOR_MAIN, 0);
+    } else {
+        lv_obj_set_style_img_recolor(abs_img, DASH_COLOR_ATTENTION, 0);
+    }
 
     if (turn_lights_ & 0x01) {
-            lv_obj_set_style_img_recolor(left_turn_img, DASH_COLOR_GREEN, 0);
-        } else {
-            lv_obj_set_style_img_recolor(left_turn_img, DASH_COLOR_DISABLED, 0);
-        }
-        if (turn_lights_ & 0x02) {
-            lv_obj_set_style_img_recolor(right_turn_img, DASH_COLOR_GREEN, 0);
-        } else {
-            lv_obj_set_style_img_recolor(right_turn_img, DASH_COLOR_DISABLED, 0);
-        }
+        lv_obj_set_style_img_recolor(left_turn_img, DASH_COLOR_GREEN, 0);
+    } else {
+        lv_obj_set_style_img_recolor(left_turn_img, DASH_COLOR_DISABLED, 0);
+    }
+    if (turn_lights_ & 0x02) {
+        lv_obj_set_style_img_recolor(right_turn_img, DASH_COLOR_GREEN, 0);
+    } else {
+        lv_obj_set_style_img_recolor(right_turn_img, DASH_COLOR_DISABLED, 0);
+    }
 
-        lv_bar_set_value(fuel_bar, fuel_pct_, LV_ANIM_OFF);
+    lv_bar_set_value(fuel_bar, fuel_pct_, LV_ANIM_OFF);
 
-        if (fuel_alarm_ > 0) {
-            lv_obj_set_style_img_recolor(fuel_img, DASH_COLOR_WARNING, 0);
-        } else {
-            lv_obj_set_style_img_recolor(fuel_img, DASH_COLOR_MAIN, 0);
-        }
+    if (fuel_alarm_ > 0) {
+        lv_obj_set_style_img_recolor(fuel_img, DASH_COLOR_WARNING, 0);
+    } else {
+        lv_obj_set_style_img_recolor(fuel_img, DASH_COLOR_MAIN, 0);
+    }
 }

@@ -1,6 +1,5 @@
 #include "ui.h"
-#include "dash.hpp"
-#include "event_machine.hpp"
+#include "screen_manager.hpp"
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/display.h>
@@ -21,11 +20,10 @@ void ui_thread(void *p1, void *p2, void *p3) {
 		return;
 	}
 
-    auto &dash = Dash::get_dash();
-    dash.load();
+	ScreenManager& sm = ScreenManager::get();
 
     while (1) {
-		dash.update();
+		sm.update();
 		lv_task_handler();
 		k_sleep(K_MSEC(10));
 	}

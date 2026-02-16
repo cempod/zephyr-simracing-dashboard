@@ -1,24 +1,18 @@
 #pragma once
 
-#include <lvgl.h>
-#include "event_machine.hpp"
+#include "screen_base.hpp"
 
-class Dash {
+class MainDash : public ScreenBase {
     public:
-        static Dash& get_dash();
-        void load();
-        void update();
+        static MainDash& get();
+        void update_callbacks() override;
+        void update() override;
     private:
-        Dash();
-        static Dash* instance;
-        #define DECLARE_EVENT(name, sys_event_e, default_value) \
-            int name##_ = default_value; \
-            static inline void name##_callback(sys_event_s event) { \
-                if (instance && event.event_type == sys_event_e) { \
-                    instance->name##_ = event.payload.int_p; \
-                } \
-            } \
+        MainDash();
+        static MainDash* instance;
         
+        virtual ~MainDash() = default;
+
         DECLARE_EVENT(speed, EV_SPEED, 0);
         DECLARE_EVENT(gear, EV_GEAR, 0);
         DECLARE_EVENT(shift, EV_SHIFT, 0);
@@ -31,10 +25,7 @@ class Dash {
         DECLARE_EVENT(beam, EV_BEAM, 0);
         DECLARE_EVENT(fuel_pct, EV_FUEL_PCT, 0);
         DECLARE_EVENT(fuel_alarm, EV_FUEL_ALARM, 0);
-    
-        #undef DECLARE_EVENT
         
-        lv_obj_t * screen;
         lv_obj_t * gear_label;
         lv_obj_t * speed_label;
         lv_obj_t * speed_label_title;
