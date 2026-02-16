@@ -7,6 +7,7 @@ set(SRCS
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/screen_manager.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/main_dash/main_dash.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/settings/settings_screen.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ui/screens/logo/logo_screen.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/fonts/digits.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/fonts/small_digits.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/abs_icon.c
@@ -15,6 +16,7 @@ set(SRCS
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/fuel_icon.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/left_turn_icon.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/right_turn_icon.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/icons/sim_logo.c
     ${CMAKE_CURRENT_LIST_DIR}/console.cpp
 )
 
@@ -26,6 +28,7 @@ target_include_directories(core INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/main_dash
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/settings
+    ${CMAKE_CURRENT_LIST_DIR}/ui/screens/logo
 )
 
 target_sources(core INTERFACE ${SRCS})

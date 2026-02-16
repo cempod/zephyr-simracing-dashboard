@@ -149,7 +149,7 @@ MainDash::MainDash() {
     lv_obj_set_style_radius(fuel_bar, 2, LV_PART_INDICATOR);
     lv_obj_set_style_bg_color(fuel_bar, DASH_COLOR_MAIN, LV_PART_INDICATOR);
     lv_obj_set_style_pad_all(fuel_bar, 4, 0);
-    lv_bar_set_value(fuel_bar, 56, LV_ANIM_OFF);
+    lv_bar_set_value(fuel_bar, 0, LV_ANIM_OFF);
 
     LV_IMG_DECLARE(left_turn_icon);
     left_turn_img = lv_img_create(screen);

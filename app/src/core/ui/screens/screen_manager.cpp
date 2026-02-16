@@ -1,4 +1,5 @@
 #include "screen_manager.hpp"
+#include "logo_screen.hpp"
 #include "screen_base.hpp"
 
 ScreenManager& ScreenManager::get() {
@@ -7,7 +8,7 @@ ScreenManager& ScreenManager::get() {
 }
 
 ScreenManager::ScreenManager() {
-    current_screen = &MainDash::get();
+    current_screen = &LogoScreen::get();
     current_screen->show();
 }
 
