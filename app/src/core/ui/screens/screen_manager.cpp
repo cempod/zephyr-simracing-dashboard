@@ -1,6 +1,8 @@
 #include "screen_manager.hpp"
 #include "logo_screen.hpp"
+#include "param_machine.hpp"
 #include "screen_base.hpp"
+#include "param_machine.hpp"
 
 ScreenManager& ScreenManager::get() {
     static ScreenManager manager;
@@ -8,7 +10,12 @@ ScreenManager& ScreenManager::get() {
 }
 
 ScreenManager::ScreenManager() {
-    current_screen = &LogoScreen::get();
+    auto &pm = ParamMachine::get_machine();
+    if (pm.get_startup_logo()) {
+        current_screen = &LogoScreen::get();
+    } else {
+        current_screen = &MainDash::get();
+    }
     current_screen->show();
 }
 

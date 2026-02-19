@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 
 set(SRCS
-    ${CMAKE_CURRENT_LIST_DIR}/backlight.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/event_machine.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/system/backlight.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/system/event_machine.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/system/param_machine.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/ui.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/screen_manager.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/main_dash/main_dash.cpp
@@ -17,13 +18,14 @@ set(SRCS
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/left_turn_icon.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/right_turn_icon.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/sim_logo.c
-    ${CMAKE_CURRENT_LIST_DIR}/console.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/system/console.cpp
 )
 
 add_library(core INTERFACE)
 
 target_include_directories(core INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/system
     ${CMAKE_CURRENT_LIST_DIR}/ui
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/main_dash

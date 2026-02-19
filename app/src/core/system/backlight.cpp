@@ -7,6 +7,7 @@
 #include <zephyr/logging/log.h>
 
 #include "event_machine.hpp"
+#include "param_machine.hpp"
 
 LOG_MODULE_REGISTER(BACKLIGHT);
 
@@ -26,12 +27,10 @@ void backlight_thread(void *p1, void *p2, void *p3) {
     static int current_brightness = 0;
     int step = 1;
     auto &em = EventMachine::get_machine();
+    auto &pm = ParamMachine::get_machine();
     em.register_callback(EV_BACKLIGHT, change_backlight);
-    sys_event_s backlight_event = {
-        .event_type = EV_BACKLIGHT,
-        .payload { .int_p = 100 }
-    };
-    em.call(backlight_event);
+    em.call({.event_type = EV_BACKLIGHT,
+                .payload = { .int_p = pm.get_brightness()}});
     while(1) {
         if (target_brightness != current_brightness) {
             if (target_brightness > current_brightness) {

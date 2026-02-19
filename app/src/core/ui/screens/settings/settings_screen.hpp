@@ -12,4 +12,6 @@ class SettingsScreen : public ScreenBase {
         static SettingsScreen* instance;
         
         virtual ~SettingsScreen() = default;
+
+        lv_obj_t * brightness_slider;
 };
