@@ -18,7 +18,7 @@ enum MessageSize {
     MSG_GEAR_SIZE = 5,
     MSG_SYSTEMS_SIZE = 7,
     MSG_LIGHTS_SIZE = 6,
-    MSG_FUEL_SIZE = 4
+    MSG_FUEL_SIZE = 5
 };
 
 enum TokenIndex {
@@ -40,7 +40,8 @@ enum TokenIndex {
     IDX_BEAM_LOW = 4,
     IDX_BEAM_HIGH = 5,
     IDX_FUEL_PCT = 2,
-    IDX_FUEL_ALARM = 3
+    IDX_FUEL_ALARM = 3,
+    IDX_EV_FUEL_VALUE = 4
 };
 
 void console_thread(void *p1, void *p2, void *p3);

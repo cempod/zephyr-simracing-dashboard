@@ -1,5 +1,6 @@
 #pragma once
 
+#include "event_machine.hpp"
 #include "screen_base.hpp"
 
 class MainDash : public ScreenBase {
@@ -25,6 +26,7 @@ class MainDash : public ScreenBase {
         DECLARE_EVENT(beam, EV_BEAM, 0);
         DECLARE_EVENT(fuel_pct, EV_FUEL_PCT, 0);
         DECLARE_EVENT(fuel_alarm, EV_FUEL_ALARM, 0);
+        DECLARE_EVENT(fuel_value, EV_FUEL_VALUE, 0);
         
         lv_obj_t * gear_label;
         lv_obj_t * speed_label;
@@ -41,6 +43,7 @@ class MainDash : public ScreenBase {
         lv_obj_t * brake_img;
         lv_obj_t * fuel_img;
         lv_obj_t * fuel_bar;
+        lv_obj_t * fuel_label;
         lv_obj_t * left_turn_img;
         lv_obj_t * right_turn_img;
 };

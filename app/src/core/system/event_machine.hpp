@@ -20,6 +20,7 @@ enum sys_event_e {
     EV_BEAM,
     EV_FUEL_PCT,
     EV_FUEL_ALARM,
+    EV_FUEL_VALUE,
     EV_COUNT
 };
 

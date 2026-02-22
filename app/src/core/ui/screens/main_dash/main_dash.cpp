@@ -1,6 +1,8 @@
 #include "main_dash.hpp"
+#include "core/lv_obj_pos.h"
 #include "dash_colors.hpp"
 #include "event_machine.hpp"
+#include "misc/lv_area.h"
 #include "screen_base.hpp"
 
 #include "screen_manager.hpp"
@@ -150,6 +152,13 @@ MainDash::MainDash() {
     lv_obj_set_style_bg_color(fuel_bar, DASH_COLOR_MAIN, LV_PART_INDICATOR);
     lv_obj_set_style_pad_all(fuel_bar, 4, 0);
     lv_bar_set_value(fuel_bar, 0, LV_ANIM_OFF);
+    
+    fuel_label= lv_label_create(screen);
+    lv_label_set_text(fuel_label, "0L");
+    lv_obj_set_style_text_font(fuel_label, &lv_font_montserrat_14, 0);
+    lv_obj_set_style_text_align(fuel_label, LV_TEXT_ALIGN_CENTER, 0);
+    lv_obj_set_style_text_color(fuel_label, DASH_COLOR_MAIN, 0);
+    lv_obj_align(fuel_label, LV_ALIGN_CENTER, 180, 36);
 
     LV_IMG_DECLARE(left_turn_icon);
     left_turn_img = lv_img_create(screen);
@@ -180,6 +189,7 @@ void MainDash::update_callbacks() {
     register_callback(EV_TURN, turn_lights_callback);
     register_callback(EV_FUEL_PCT, fuel_pct_callback);
     register_callback(EV_FUEL_ALARM, fuel_alarm_callback);
+    register_callback(EV_FUEL_VALUE, fuel_value_callback);
 }
 
 void MainDash::update() {
@@ -242,7 +252,11 @@ void MainDash::update() {
 
     if (fuel_alarm_ > 0) {
         lv_obj_set_style_img_recolor(fuel_img, DASH_COLOR_WARNING, 0);
+        lv_obj_set_style_text_color(fuel_label, DASH_COLOR_WARNING, 0);
     } else {
         lv_obj_set_style_img_recolor(fuel_img, DASH_COLOR_MAIN, 0);
+        lv_obj_set_style_text_color(fuel_label, DASH_COLOR_MAIN, 0);
     }
+
+    set_label_text(fuel_label, "%dL", fuel_value_);
 }

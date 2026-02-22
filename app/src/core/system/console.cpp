@@ -139,6 +139,7 @@ void parse_fuel(const ParseContext& ctx) {
 
 	ctx.em.call(create_int_event(EV_FUEL_PCT, parse_int(ctx.tokens[IDX_FUEL_PCT])));
 	ctx.em.call(create_int_event(EV_FUEL_ALARM, parse_int(ctx.tokens[IDX_FUEL_ALARM])));
+	ctx.em.call(create_int_event(EV_FUEL_VALUE, parse_int(ctx.tokens[IDX_EV_FUEL_VALUE])));
 }
 
 void console_thread(void *p1, void *p2, void *p3) {
