@@ -5,8 +5,8 @@
 
 #include "screen_manager.hpp"
 
-LV_FONT_DECLARE(digits)
-LV_FONT_DECLARE(small_digits)
+LV_FONT_DECLARE(digit_96)
+LV_FONT_DECLARE(digit_64)
 
 MainDash* MainDash::instance = nullptr;
 
@@ -34,14 +34,14 @@ MainDash::MainDash() {
 
     gear_label= lv_label_create(screen);
     lv_label_set_text(gear_label, "N");
-    lv_obj_set_style_text_font(gear_label, &digits, 0);
+    lv_obj_set_style_text_font(gear_label, &digit_96, 0);
     lv_obj_set_style_text_align(gear_label, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_color(gear_label, DASH_COLOR_MAIN, 0);
-    lv_obj_align(gear_label, LV_ALIGN_BOTTOM_MID, 0, -13);
+    lv_obj_align(gear_label, LV_ALIGN_BOTTOM_MID, 0, -15);
 
     speed_label = lv_label_create(screen);
     lv_label_set_text(speed_label, "0");
-    lv_obj_set_style_text_font(speed_label, &digits, 0);
+    lv_obj_set_style_text_font(speed_label, &digit_96, 0);
     lv_obj_set_style_text_align(speed_label, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_color(speed_label, DASH_COLOR_MAIN, 0);
     lv_obj_align(speed_label, LV_ALIGN_CENTER, 0, 0);
@@ -94,7 +94,7 @@ MainDash::MainDash() {
 
     rpm_label= lv_label_create(screen);
     lv_label_set_text(rpm_label, "0");
-    lv_obj_set_style_text_font(rpm_label, &small_digits, 0);
+    lv_obj_set_style_text_font(rpm_label, &digit_64, 0);
     lv_obj_set_style_text_align(rpm_label, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_color(rpm_label, DASH_COLOR_MAIN, 0);
     lv_obj_align(rpm_label, LV_ALIGN_TOP_MID, 0, 51);

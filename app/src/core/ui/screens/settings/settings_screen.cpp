@@ -1,13 +1,7 @@
 #include "settings_screen.hpp"
-#include "core/lv_event.h"
-#include "dash_colors.hpp"
-#include "misc/lv_area.h"
 #include "param_machine.hpp"
 #include "screen_manager.hpp"
 #include "event_machine.hpp"
-
-LV_FONT_DECLARE(digits)
-LV_FONT_DECLARE(small_digits)
 
 SettingsScreen* SettingsScreen::instance = nullptr;
 

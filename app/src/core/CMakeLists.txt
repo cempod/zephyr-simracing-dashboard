@@ -9,8 +9,8 @@ set(SRCS
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/main_dash/main_dash.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/settings/settings_screen.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ui/screens/logo/logo_screen.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/ui/fonts/digits.c
-    ${CMAKE_CURRENT_LIST_DIR}/ui/fonts/small_digits.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/fonts/digit_96.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/fonts/digit_64.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/abs_icon.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/brake_icon.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/icons/esp_icon.c
