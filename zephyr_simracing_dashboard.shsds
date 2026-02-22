@@ -12,7 +12,7 @@
   "EditorExpanded": true,
   "Name": "Custom Serial device",
   "Description": "Serial device",
-  "LastErrorDate": "2026-02-01T13:35:43.8416087+03:00",
+  "LastErrorDate": "2026-02-22T23:59:53.8018118+03:00",
   "LastErrorMessage": null,
   "IsFreezed": false,
   "SettingsBuilder": {
@@ -56,10 +56,10 @@
     },
     {
       "Message": {
-        "Expression": "'SH;5;' + truncate([FuelPercent]) + ';' + [CarSettings_FuelAlertActive] + '\\n'"
+        "Expression": "'SH;5;' + truncate([FuelPercent]) + ';' + [CarSettings_FuelAlertActive] + ';' + truncate([Fuel]) + '\\n'"
       },
       "IsEnabled": true,
-      "MaximumFrequency": 0
+      "MaximumFrequency": 5
     }
   ]
 }
