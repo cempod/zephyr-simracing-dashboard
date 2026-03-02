@@ -25,7 +25,12 @@ LogoScreen::LogoScreen() {
     lv_img_set_src(logo, &sim_logo);
     lv_obj_align(logo, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_size(logo, 360, 110);
-    static lv_timer_t* logo_timer = lv_timer_create(logo_timeout, 3000, NULL);
+}
+
+void LogoScreen::on_show() {
+    if (logo_timer == nullptr) {
+        logo_timer = lv_timer_create(logo_timeout, 3000, NULL);
+    }
     lv_timer_set_repeat_count(logo_timer, 1);
 }
 

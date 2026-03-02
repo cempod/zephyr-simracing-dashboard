@@ -11,7 +11,10 @@ class ScreenBase {
                 update_callbacks();
             }
             lv_scr_load(screen);
+            on_show();
         }
+
+        virtual void on_show() {}
 
         void detach() {
             for (sys_event_token event_token : callback_tokens_) {
