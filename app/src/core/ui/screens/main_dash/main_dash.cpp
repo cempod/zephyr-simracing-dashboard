@@ -18,12 +18,12 @@ MainDash& MainDash::get() {
 }
 
 static void screen_gesture_event(lv_event_t * e) {
-    lv_obj_t * screen = lv_event_get_current_target(e);
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
     switch(dir) {
         case LV_DIR_BOTTOM:
             ScreenManager::get().set_screen(ScreenType::SettingsScreen);
         break;
+        default: break;
     }
 }
 
@@ -55,10 +55,10 @@ MainDash::MainDash() {
     lv_obj_set_style_text_color(speed_label_title, DASH_COLOR_MAIN, 0);
     lv_obj_align(speed_label_title, LV_ALIGN_CENTER, 0, 50);
 
-    static lv_point_t line_left_points[] = { {0, 0 }, {99, 115}, {99, 220}, {0, 319} };
-    static lv_point_t line_right_points[] = { {479, 0 }, {380, 115}, {380, 220}, {479, 319} };
-    static lv_point_t line_top_points[] = { {99, 115 }, {380, 115} };
-    static lv_point_t line_bottom_points[] = { {99, 220 }, {380, 220} };
+    static lv_point_precise_t line_left_points[] = { {0, 0 }, {99, 115}, {99, 220}, {0, 319} };
+    static lv_point_precise_t line_right_points[] = { {479, 0 }, {380, 115}, {380, 220}, {479, 319} };
+    static lv_point_precise_t line_top_points[] = { {99, 115 }, {380, 115} };
+    static lv_point_precise_t line_bottom_points[] = { {99, 220 }, {380, 220} };
 
     static lv_style_t style_line;
     lv_style_init(&style_line);

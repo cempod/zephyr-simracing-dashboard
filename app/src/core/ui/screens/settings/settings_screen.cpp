@@ -1,4 +1,5 @@
 #include "settings_screen.hpp"
+#include "core/lv_obj_event.h"
 #include "param_machine.hpp"
 #include "screen_manager.hpp"
 #include "event_machine.hpp"
@@ -11,18 +12,18 @@ SettingsScreen& SettingsScreen::get() {
 }
 
 static void screen_gesture_event(lv_event_t * e) {
-    lv_obj_t * screen = lv_event_get_current_target(e);
     lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_get_act());
     switch(dir) {
         case LV_DIR_TOP:
             ScreenManager::get().set_screen(ScreenType::MainDash);
         break;
+        default: break;
     }
 }
 
 static void slider_event_cb(lv_event_t * e)
 {
-    lv_obj_t * slider = lv_event_get_target(e);
+    lv_obj_t * slider = lv_event_get_target_obj(e);
     EventMachine::get_machine().call({.event_type = EV_BACKLIGHT,
                 .payload = { .int_p = lv_slider_get_value(slider)}});
     ParamMachine::get_machine().set_brightness(lv_slider_get_value(slider));

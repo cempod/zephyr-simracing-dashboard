@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 96 px
  * Bpp: 4
- * Opts: --bpp 4 --size 96 --no-compress --stride 1 --align 1 --font digital-7 (mono italic).ttf --symbols 1234567890NR  --format lvgl -o digit_96.c
+ * Opts: --bpp 4 --size 96 --no-compress --stride 1 --align 1 --font digital-7 (mono italic).ttf --symbols 1234567890NR --format lvgl -o digit_96.c
  ******************************************************************************/
 
 #ifdef __has_include
@@ -32,8 +32,6 @@
 
 /*Store the image of the glyphs*/
 static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
-    /* U+0020 " " */
-
     /* U+0030 "0" */
     0x0, 0x0, 0x0, 0x0, 0x7, 0xdf, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -1940,7 +1938,6 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
 
 static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
     {.bitmap_index = 0, .adv_w = 0, .box_w = 0, .box_h = 0, .ofs_x = 0, .ofs_y = 0} /* id = 0 reserved */,
-    {.bitmap_index = 0, .adv_w = 726, .box_w = 0, .box_h = 0, .ofs_x = 0, .ofs_y = 0},
     {.bitmap_index = 0, .adv_w = 726, .box_w = 43, .box_h = 63, .ofs_x = 1, .ofs_y = 0},
     {.bitmap_index = 1355, .adv_w = 726, .box_w = 13, .box_h = 63, .ofs_x = 31, .ofs_y = 0},
     {.bitmap_index = 1765, .adv_w = 726, .box_w = 43, .box_h = 63, .ofs_x = 1, .ofs_y = 0},
@@ -1959,17 +1956,20 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
  *  CHARACTER MAPPING
  *--------------------*/
 
-static const uint16_t unicode_list_0[] = {
-    0x0, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-    0x17, 0x18, 0x19, 0x2e, 0x32
+static const uint16_t unicode_list_1[] = {
+    0x0, 0x4
 };
 
 /*Collect the unicode lists and glyph_id offsets*/
 static const lv_font_fmt_txt_cmap_t cmaps[] =
 {
     {
-        .range_start = 32, .range_length = 51, .glyph_id_start = 1,
-        .unicode_list = unicode_list_0, .glyph_id_ofs_list = NULL, .list_length = 13, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
+        .range_start = 48, .range_length = 10, .glyph_id_start = 1,
+        .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
+    },
+    {
+        .range_start = 78, .range_length = 5, .glyph_id_start = 11,
+        .unicode_list = unicode_list_1, .glyph_id_ofs_list = NULL, .list_length = 2, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
     }
 };
 
@@ -1994,7 +1994,7 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
     .cmaps = cmaps,
     .kern_dsc = NULL,
     .kern_scale = 0,
-    .cmap_num = 1,
+    .cmap_num = 2,
     .bpp = 4,
     .kern_classes = 0,
     .bitmap_format = 0,
@@ -2027,6 +2027,7 @@ lv_font_t digit_96 = {
     .underline_position = -10,
     .underline_thickness = 6,
 #endif
+    .static_bitmap = 0,
     .dsc = &font_dsc,          /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 #if LV_VERSION_CHECK(8, 2, 0) || LVGL_VERSION_MAJOR >= 9
     .fallback = NULL,

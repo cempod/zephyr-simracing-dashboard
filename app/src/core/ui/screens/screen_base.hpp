@@ -35,7 +35,7 @@ class ScreenBase {
             char str[50];
             va_list ap;
             va_start(ap, msg);
-            vsnprintf(str, sizeof(str), msg, ap);
+            vsnprintk(str, sizeof(str), msg, ap);
             va_end(ap);
             lv_label_set_text(label, str);
         }
