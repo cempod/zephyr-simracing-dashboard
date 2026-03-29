@@ -90,6 +90,7 @@ MainDash::MainDash() {
     lv_obj_set_style_border_color(rpm_bar, DASH_COLOR_MAIN, 0);
     lv_obj_set_style_border_width(rpm_bar, 2, 0);
     lv_obj_set_style_border_opa(rpm_bar, LV_OPA_COVER, 0);
+    lv_obj_set_style_radius(rpm_bar, 4, LV_PART_MAIN);
     lv_obj_set_style_radius(rpm_bar, 2, LV_PART_INDICATOR);
     lv_obj_set_style_bg_color(rpm_bar, DASH_COLOR_MAIN, LV_PART_INDICATOR);
     lv_obj_set_style_pad_all(rpm_bar, 4, 0);
@@ -148,6 +149,7 @@ MainDash::MainDash() {
     lv_obj_set_style_border_color(fuel_bar, DASH_COLOR_MAIN, 0);
     lv_obj_set_style_border_width(fuel_bar, 2, 0);
     lv_obj_set_style_border_opa(fuel_bar, LV_OPA_COVER, 0);
+    lv_obj_set_style_radius(fuel_bar, 4, LV_PART_MAIN);
     lv_obj_set_style_radius(fuel_bar, 2, LV_PART_INDICATOR);
     lv_obj_set_style_bg_color(fuel_bar, DASH_COLOR_MAIN, LV_PART_INDICATOR);
     lv_obj_set_style_pad_all(fuel_bar, 4, 0);
