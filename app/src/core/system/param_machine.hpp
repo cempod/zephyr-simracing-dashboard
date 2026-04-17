@@ -3,7 +3,7 @@
 #include <functional>
 #include <sys/_stdint.h>
 #include <zephyr/kernel.h>
-#include <zephyr/fs/nvs.h>
+#include <zephyr/kvss/nvs.h>
 
 enum sys_param_e {
     PR_BRIGHTNESS = 0,

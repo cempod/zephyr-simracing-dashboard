@@ -4,8 +4,8 @@
 #include <zephyr/storage/flash_map.h>
 
 #define NVS_PARTITION		storage_partition
-#define NVS_PARTITION_DEVICE	FIXED_PARTITION_DEVICE(NVS_PARTITION)
-#define NVS_PARTITION_OFFSET	FIXED_PARTITION_OFFSET(NVS_PARTITION)
+#define NVS_PARTITION_DEVICE	PARTITION_DEVICE(NVS_PARTITION)
+#define NVS_PARTITION_OFFSET	PARTITION_OFFSET(NVS_PARTITION)
 
 ParamMachine& ParamMachine::get_machine() {
     static ParamMachine machine;
